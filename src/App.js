@@ -3,8 +3,26 @@ import { Route, Routes } from "react-router-dom";
 import { Header, MainContainer, CreateContainer } from "./components";
 
 import { AnimatePresence } from "framer-motion";
+import { useStateValue } from "./context/StateProvider";
+import { getAllFoodItems } from "./utils/firebaseFunctions";
+import { useEffect } from "react";
+import { actionType } from "./context/Reducer";
 
 const App = () => {
+  const [{ foodItems }, dispatch] = useStateValue();
+  const fetchData = async () => {
+    await getAllFoodItems().then((data) => {
+      dispatch({
+        type: actionType.SET_FOOD_ITEMS,
+        foodItems: data,
+      });
+    });
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <AnimatePresence exitBeforeEnter>
       <div className="w-screen h-auto flex flex-col bg-primary">
@@ -14,7 +32,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<MainContainer />} />
             <Route path="/createItem" element={<CreateContainer />} />
-          </Routes> 
+          </Routes>
         </main>
       </div>
     </AnimatePresence>
